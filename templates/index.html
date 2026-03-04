@@ -1,0 +1,52 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>SimuHire — Interview</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card form-card" id="registration">
+      <h1>SimuHire</h1>
+      <p>Register Candidate</p>
+      <form id="candidateForm" enctype="multipart/form-data">
+        <div class="row">
+          <input name="first_name" placeholder="First name" required />
+          <input name="middle_name" placeholder="Middle name" />
+          <input name="last_name" placeholder="Last name" required />
+        </div>
+        <div class="row">
+          <label>Date of Birth</label>
+          <input type="date" name="dob" required />
+        </div>
+        <div class="row">
+          <input name="skills" placeholder="Skills (comma separated)" required />
+        </div>
+        <div class="row">
+          <input name="job_role" placeholder="Target Job Role (e.g. Python Dev)" required />
+        </div>
+        <div class="row">
+          <label>Upload Resume (PDF)</label>
+          <input name="resume" type="file" accept="application/pdf" required />
+        </div>
+        <div class="row">
+          <button type="submit" class="btn">Start Interview</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card quiz-card" id="quiz" style="display:none;">
+      <h2>Interview Questions</h2>
+      <div id="questionsContainer"></div>
+      <div style="text-align:center; margin-top:1rem;">
+        <button id="submitAnswersBtn" class="btn">Submit Answers</button>
+      </div>
+      <div id="result" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

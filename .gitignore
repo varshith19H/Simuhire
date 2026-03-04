@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+uploads/
+sessions/
+.venv/
+venv/
+.python-version
+.vercel/
+.DS_Store
+Thumbs.db

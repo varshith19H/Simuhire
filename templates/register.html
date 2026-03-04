@@ -1,0 +1,63 @@
+<!-- templates/register.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Apply — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card form-card">
+      <h1>Register for SimuHire</h1>
+      <p>Fill your details. Resume (PDF) is compulsory.</p>
+      <form id="applyForm" enctype="multipart/form-data" method="post" action="/apply">
+        <div class="row">
+          <input name="first_name" placeholder="First name" required />
+          <input name="middle_name" placeholder="Middle name" />
+          <input name="last_name" placeholder="Last name" required />
+        </div>
+        <div class="row">
+          <input type="date" name="dob" required />
+          <input name="email" placeholder="Email" type="email" required />
+          <input name="phone" placeholder="Phone" required />
+        </div>
+        <div class="row">
+          <input name="address" placeholder="Address" required />
+        </div>
+        <div class="row">
+          <input name="skills" placeholder="Skills (comma separated)" required />
+          <input name="job_role" placeholder="Target Job Role" required />
+        </div>
+        <div class="row">
+          <label>Upload Resume (PDF)</label>
+          <input name="resume" type="file" accept="application/pdf" required />
+        </div>
+        <div class="row">
+          <button type="submit" class="btn">Submit Application</button>
+        </div>
+      </form>
+      <div id="applyResult"></div>
+    </div>
+  </div>
+
+<script>
+document.getElementById("applyForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const btn = e.target.querySelector(".btn");
+  btn.disabled = true; btn.textContent = "Submitting...";
+
+  const res = await fetch("/apply", { method: "POST", body: fd });
+  const data = await res.json();
+  if (res.ok) {
+    document.getElementById("applyResult").innerText = "Application submitted successfully. Candidate ID: " + data.candidate_id;
+    e.target.reset();
+  } else {
+    document.getElementById("applyResult").innerText = "Error: " + (data.error || JSON.stringify(data));
+  }
+  btn.disabled = false; btn.textContent = "Submit Application";
+});
+</script>
+</body>
+</html>

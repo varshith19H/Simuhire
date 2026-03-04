@@ -1,0 +1,21 @@
+<!-- templates/admin_login.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HR Login — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card form-card">
+      <h1>HR Panel Login</h1>
+      <form method="post" action="/admin/login">
+        <div class="row"><input name="username" placeholder="Admin username" required /></div>
+        <div class="row"><input name="password" placeholder="Password" type="password" required /></div>
+        <div class="row"><button class="btn" type="submit">Login</button></div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

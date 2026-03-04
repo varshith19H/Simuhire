@@ -1,0 +1,21 @@
+<!-- templates/candidate_login.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Candidate Login — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Candidate Login</h1>
+      <form method="post" action="/candidate/login">
+        <div class="row"><input name="username" placeholder="Username" required /></div>
+        <div class="row"><input name="password" placeholder="Password" type="password" required /></div>
+        <div class="row"><button class="btn" type="submit">Login</button></div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

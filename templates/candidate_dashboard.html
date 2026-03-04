@@ -1,0 +1,45 @@
+<!-- templates/candidate_dashboard.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Your Dashboard — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h1>Welcome, {{ candidate.first_name }}</h1>
+      <a href="/candidate/logout" class="btn">Logout</a>
+    </div>
+
+    <div class="card">
+      <h3>Application Status: {{ candidate.status }}</h3>
+      {% if not candidate.account_created %}
+        <p>Your account is not yet created. Wait for HR approval.</p>
+      {% endif %}
+      {% if candidate.status == 'accepted' and not candidate.test_taken %}
+        <p>You may start your interview now.</p>
+        <button id="startTest" class="btn">Start Test</button>
+      {% endif %}
+      {% if candidate.test_taken %}
+        <p>Your score: <strong>{{ candidate.score }}</strong></p>
+        <p>AI Feedback:</p>
+        <pre>{{ candidate.ai_feedback | tojson(indent=2) }}</pre>
+      {% endif %}
+    </div>
+  </div>
+
+<script>
+document.getElementById("startTest")?.addEventListener("click", async () => {
+  if(!confirm("Start test? You can take the test only once.")) return;
+  const resp = await fetch("/candidate/start_test", {method:"POST"});
+  const j = await resp.json();
+  if(j.error){ alert("Error: "+j.error); return; }
+  // Save test in sessionStorage and navigate to test page (we will reuse earlier quiz UI)
+  sessionStorage.setItem("test_payload", JSON.stringify(j));
+  window.location.href = "/candidate/test";
+});
+</script>
+</body>
+</html>

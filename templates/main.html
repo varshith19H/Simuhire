@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SimuHire | AI Interview Automation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Inter',sans-serif;
+        }
+        
+        body{
+            background:#0F172A;
+            color:#E2E8F0;
+        }
+        
+        /* ---------- HEADER ---------- */
+        
+        header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:25px 80px;
+            background:#0B1220;
+            border-bottom:1px solid rgba(255,255,255,0.05);
+        }
+        
+        header h2{
+            font-size:24px;
+            font-weight:600;
+            letter-spacing:1px;
+        }
+        
+        nav button{
+            background:transparent;
+            border:1px solid rgba(255,255,255,0.2);
+            color:#E2E8F0;
+            padding:8px 18px;
+            border-radius:8px;
+            margin-left:10px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+        
+        nav button:hover{
+            background:linear-gradient(135deg,#10B981,#06B6D4);
+            border:none;
+        }
+        
+        /* ---------- SECTIONS ---------- */
+        
+        section{
+            display:none;
+            padding:100px 80px;
+            animation:fadeIn 0.6s ease;
+        }
+        
+        .active{
+            display:block;
+        }
+        
+        @keyframes fadeIn{
+            from{opacity:0; transform:translateY(20px);}
+            to{opacity:1; transform:translateY(0);}
+        }
+        
+        /* ---------- HERO ---------- */
+        
+        .hero{
+            max-width:1000px;
+        }
+        
+        .hero h1{
+            font-size:64px;
+            line-height:1.1;
+            font-weight:700;
+        }
+        
+        .hero span{
+            background:linear-gradient(135deg,#10B981,#06B6D4);
+            -webkit-background-clip:text;
+            background-clip:text;
+            -webkit-text-fill-color:transparent;
+        }
+        
+        .hero p{
+            margin-top:30px;
+            font-size:18px;
+            color:#94A3B8;
+            line-height:1.7;
+            max-width:700px;
+        }
+        
+        .primary-btn{
+            margin-top:40px;
+            background:linear-gradient(135deg,#10B981,#06B6D4);
+            border:none;
+            padding:14px 30px;
+            border-radius:10px;
+            font-size:16px;
+            font-weight:600;
+            color:white;
+            cursor:pointer;
+            transition:0.3s;
+        }
+        
+        .primary-btn:hover{
+            transform:translateY(-3px);
+            box-shadow:0 8px 30px rgba(16,185,129,0.3);
+        }
+        
+        /* ---------- FEATURES ---------- */
+        
+        .features{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:40px;
+            margin-top:100px;
+        }
+        
+        .feature-card{
+            background:#111827;
+            padding:30px;
+            border-radius:16px;
+            border:1px solid rgba(255,255,255,0.05);
+            transition:0.3s;
+        }
+        
+        .feature-card:hover{
+            transform:translateY(-5px);
+            border-color:#10B981;
+        }
+        
+        .feature-card h3{
+            margin-bottom:15px;
+        }
+        
+        .feature-card p{
+            color:#94A3B8;
+            line-height:1.6;
+        }
+        
+        /* ---------- CARD ---------- */
+        
+        .card{
+            background:#111827;
+            padding:40px;
+            border-radius:16px;
+            border:1px solid rgba(255,255,255,0.05);
+            max-width:700px;
+            margin:auto;
+        }
+        
+        input{
+            width:100%;
+            padding:12px;
+            margin-bottom:15px;
+            border-radius:8px;
+            border:1px solid rgba(255,255,255,0.1);
+            background:#0F172A;
+            color:white;
+        }
+        
+        button{
+            cursor:pointer;
+        }
+        .question-card{
+    background: rgba(255,255,255,0.05);
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.3s ease;
+}
+
+.question-card:hover{
+    border: 1px solid #6366f1;
+}
+
+.question-header{
+    font-size:14px;
+    color:#94a3b8;
+    margin-bottom:10px;
+}
+
+.question-text{
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+.options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.option-item{
+    background:#1e293b;
+    padding:12px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    transition:0.2s ease;
+}
+
+.option-item:hover{
+    background:#334155;
+}
+
+.option-item input{
+    accent-color:#6366f1;
+}
+
+.submit-btn{
+    margin-top:30px;
+    padding:14px 25px;
+    background:#6366f1;
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.submit-btn:hover{
+    background:#4f46e5;
+}
+.resume-btn{
+    background:#10b981;
+    padding:8px 14px;
+    border-radius:6px;
+    color:white;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.resume-btn:hover{
+    background:#059669;
+}
+
+.review-card{
+    background:#1e293b;
+    padding:15px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.virtual-avatar-wrap{
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    padding:24px;
+    margin-bottom:20px;
+}
+
+.virtual-avatar{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#06b6d4,#22c55e);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    margin-bottom:14px;
+}
+
+.virtual-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+}
+
+.virtual-avatar.speaking{
+    animation:avatarPulse 1.2s infinite;
+}
+
+@keyframes avatarPulse{
+    0%{transform:scale(1); box-shadow:0 0 0 0 rgba(34,197,94,0.35);}
+    70%{transform:scale(1.06); box-shadow:0 0 0 14px rgba(34,197,94,0);}
+    100%{transform:scale(1); box-shadow:0 0 0 0 rgba(34,197,94,0);}
+}
+
+.virtual-meta{
+    color:#94a3b8;
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+.virtual-timer{
+    height:8px;
+    background:#1e293b;
+    border-radius:999px;
+    overflow:hidden;
+    margin:10px 0 14px;
+}
+
+.virtual-timer-fill{
+    height:100%;
+    background:linear-gradient(90deg,#06b6d4,#22c55e);
+    width:100%;
+    transition:width 1s linear;
+}
+
+.virtual-answer-box{
+    width:100%;
+    min-height:120px;
+    resize:vertical;
+    border:1px solid rgba(255,255,255,0.1);
+    background:#0b1220;
+    color:#e2e8f0;
+    border-radius:10px;
+    padding:12px;
+}
+
+.candidate-live-video{
+    width:220px;
+    height:150px;
+    border-radius:12px;
+    background:#020617;
+    border:1px solid rgba(255,255,255,0.1);
+    object-fit:cover;
+}
+
+/* Bright + Calm UI Overrides */
+:root{
+    --bg-1:#f5fbff;
+    --bg-2:#eefaf1;
+    --surface:#ffffff;
+    --surface-soft:#f8fcff;
+    --text:#1f2937;
+    --muted:#64748b;
+    --accent:#0ea5e9;
+    --accent-2:#22c55e;
+    --border:#dbe7f3;
+    --shadow:0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+body{
+    background:radial-gradient(circle at 10% 10%, #ffffff 0%, var(--bg-1) 45%, var(--bg-2) 100%);
+    color:var(--text);
+}
+
+header{
+    background:rgba(255,255,255,0.86);
+    border-bottom:1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+header h2{ color:#0f172a; }
+
+nav button{
+    background:#fff;
+    color:#0f172a;
+    border:1px solid var(--border);
+}
+
+nav button:hover{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff;
+}
+
+.hero h1{ color:#0f172a; }
+.hero p{ color:var(--muted); }
+
+.primary-btn, .submit-btn{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff;
+    border:none;
+    box-shadow:0 8px 24px rgba(14,165,233,0.22);
+}
+
+.primary-btn:hover, .submit-btn:hover{ transform:translateY(-2px); }
+
+.feature-card, .card, .question-card, .review-card, .virtual-avatar-wrap{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text);
+    box-shadow:var(--shadow);
+}
+
+input, .virtual-answer-box, textarea{
+    background:var(--surface-soft);
+    color:var(--text);
+    border:1px solid var(--border);
+}
+
+.option-item{
+    background:#f4f9ff;
+    border:1px solid #e4eef8;
+}
+.option-item:hover{ background:#e8f4ff; }
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    overflow:hidden;
+    border-radius:10px;
+}
+th, td{
+    border-bottom:1px solid var(--border);
+    padding:10px;
+    text-align:left;
+}
+th{
+    background:#f2f8ff;
+    color:#0f172a;
+}
+
+.virtual-meta{ color:var(--muted); }
+
+/* Global loader */
+.global-loader{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(248,252,255,0.75);
+    backdrop-filter: blur(3px);
+    z-index:9999;
+}
+.global-loader.show{ display:flex; }
+.global-loader .loader-card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 22px;
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#0f172a;
+    font-weight:600;
+}
+.global-loader .spinner{
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    border:3px solid #cde7fb;
+    border-top-color:#0ea5e9;
+    animation:spin .8s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg);} }
+
+.page-shell{
+    max-width:1200px;
+    margin:0 auto;
+}
+
+.section-title{
+    font-size:32px;
+    color:#0f172a;
+    margin-bottom:10px;
+}
+
+.section-subtitle{
+    color:var(--muted);
+    margin-bottom:24px;
+}
+
+.dashboard-banner{
+    background:linear-gradient(120deg, #e0f2fe, #dcfce7);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px 20px;
+    margin-bottom:20px;
+    box-shadow:var(--shadow);
+}
+
+.apply-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+    margin-top:14px;
+}
+
+.apply-grid .full-span{
+    grid-column:1 / -1;
+}
+
+.kpi-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:22px;
+    margin-bottom:28px;
+}
+
+.kpi-card{
+    text-align:center;
+    padding:26px 22px;
+}
+
+.kpi-card h3{
+    font-size:34px;
+    color:#0369a1;
+}
+
+.table-shell{
+    overflow:auto;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:#f8fbff;
+    padding:10px;
+}
+
+.data-table{
+    min-width:980px;
+    width:100%;
+    table-layout:auto;
+}
+
+.data-table th,
+.data-table td{
+    padding:16px 14px;
+    vertical-align:middle;
+}
+
+.actions-cell{
+    min-width:280px;
+}
+
+.table-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.table-actions .resume-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.table-actions button{
+    min-width:96px;
+}
+
+.role-cell{
+    min-width:150px;
+}
+
+.status-chip{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    background:#e0f2fe;
+    color:#0c4a6e;
+}
+
+button{
+    background:#fff;
+    border:1px solid var(--border);
+    color:#0f172a;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:600;
+}
+
+button:hover{
+    background:#eef8ff;
+}
+
+.btn-danger{
+    background:#ef4444;
+    border-color:#ef4444;
+    color:#fff;
+}
+
+.btn-danger:hover{
+    background:#dc2626;
+}
+
+.muted-note{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.hr-block{
+    padding:26px 22px;
+}
+
+.round-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:22px;
+    margin-top:24px;
+}
+
+.candidate-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#ecfeff;
+    color:#155e75;
+    font-size:12px;
+    font-weight:700;
+}
+
+.modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:10001;
+    padding:20px;
+}
+
+.modal-backdrop.show{
+    display:flex;
+}
+
+.result-modal{
+    width:min(920px, 100%);
+    max-height:85vh;
+    overflow:auto;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 30px 60px rgba(15, 23, 42, 0.2);
+    padding:20px;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+    margin:14px 0 18px;
+}
+
+.result-tile{
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:#f8fbff;
+    padding:12px;
+}
+
+.result-tile h4{
+    font-size:13px;
+    color:#0f172a;
+    margin-bottom:6px;
+}
+
+.result-tile p{
+    font-size:14px;
+    color:#334155;
+}
+
+@media (max-width:900px){
+    .apply-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Responsive layout */
+header{
+    background:rgb(194 226 246 / 86%);
+}
+
+@media (max-width: 1200px){
+    section{
+        padding:80px 36px;
+    }
+    header{
+        padding:20px 36px;
+    }
+    .hero h1{
+        font-size:50px;
+    }
+}
+
+@media (max-width: 900px){
+    header{
+        padding:16px 18px;
+        gap:12px;
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    nav{
+        width:100%;
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+    }
+    nav button{
+        margin-left:0;
+        flex:1 1 calc(50% - 8px);
+    }
+    section{
+        padding:62px 18px;
+    }
+    .hero h1{
+        font-size:38px;
+    }
+    .hero p{
+        font-size:16px;
+    }
+    .card{
+        max-width:100%;
+        padding:22px;
+    }
+    .kpi-row{
+        gap:14px;
+    }
+    .data-table{
+        min-width:760px;
+    }
+}
+
+@media (max-width: 640px){
+    section{
+        padding:52px 12px;
+    }
+    nav button{
+        flex:1 1 100%;
+    }
+    .hero h1{
+        font-size:30px;
+    }
+    .hero p{
+        font-size:15px;
+        margin-top:16px;
+    }
+    .primary-btn, .submit-btn{
+        width:100%;
+    }
+    .card{
+        padding:16px;
+    }
+    .table-shell{
+        padding:6px;
+    }
+    .data-table{
+        min-width:640px;
+    }
+    .candidate-live-video{
+        width:100%;
+        max-width:280px;
+        height:170px;
+    }
+}
+        </style>
+        
+        
+</head>
+<body>
+
+<header>
+    <h2>SimuHire</h2>
+
+  
+        <nav>
+            <button onclick="showSection('landing')">Home</button>
+            <button onclick="showSection('apply')">Apply</button>
+            <button onclick="showSection('hrLogin')">HR</button>
+            <button onclick="showSection('candidateLogin')">Candidate</button>
+            <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+        </nav>
+ 
+    
+</header>
+
+<div id="globalLoader" class="global-loader" aria-live="polite" aria-busy="true">
+    <div class="loader-card">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+</div>
+
+<!-- LANDING -->
+<section id="landing" class="active">
+
+<div class="hero">
+
+<h1>
+    AI-Driven <span>Interview Automation</span><br>
+    For Modern HR Teams
+</h1>
+
+<p>
+SimuHire is an intelligent recruitment automation platform that enables HR teams 
+to screen, evaluate, and assess candidates using structured AI-based interviews. 
+Reduce hiring time, eliminate manual screening, and make data-driven decisions 
+with automated scoring and real-time analytics.
+</p>
+
+<button class="primary-btn" onclick="showSection('apply')">
+    Start Application
+</button>
+
+</div>
+
+<div class="features">
+
+<div class="feature-card">
+<h3>Structured AI Interviews</h3>
+<p>
+Generate dynamic role-specific MCQ assessments powered by AI models for consistent and scalable candidate screening.
+</p>
+</div>
+
+<div class="feature-card">
+<h3>Automated Evaluation</h3>
+<p>
+Instant scoring system ensures unbiased evaluation with performance metrics tracked in real time.
+</p>
+</div>
+
+<div class="feature-card">
+<h3>HR Control Panel</h3>
+<p>
+Manage applications, track interview progress, review resumes, and monitor hiring analytics from a single dashboard.
+</p>
+</div>
+
+<div class="feature-card">
+<h3>Secure Credential System</h3>
+<p>
+Automatically generate secure login credentials for selected candidates with controlled one-time interview access.
+</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- APPLY -->
+<section id="apply">
+    <div class="page-shell">
+        <h2 class="section-title">Apply For Interview</h2>
+        <p class="section-subtitle">Submit your profile to begin the SimuHire screening workflow.</p>
+        <div class="card">
+            <div class="dashboard-banner">
+                <b>Candidate Intake</b>
+                <p class="muted-note">Upload your resume in PDF format. HR will review and share credentials if shortlisted.</p>
+            </div>
+            <form id="applyForm" class="apply-grid">
+                <input name="first_name" placeholder="First Name" required>
+                <input name="last_name" placeholder="Last Name" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                <input name="skills" placeholder="Primary Skills (comma separated)" required>
+                <input name="job_role" placeholder="Applied Job Role" required>
+                <div class="full-span">
+                    <input type="file" name="resume" accept="application/pdf" required>
+                </div>
+                <div class="full-span">
+                    <button type="submit" class="submit-btn">Submit Application</button>
+                </div>
+            </form>
+            <p id="applyMsg" class="muted-note"></p>
+        </div>
+    </div>
+</section>
+
+<!-- HR LOGIN -->
+<section id="hrLogin">
+    <div class="card">
+        <h2>HR Login</h2>
+        <input id="hrUser" placeholder="Username">
+        <input id="hrPass" type="password" placeholder="Password">
+        <button onclick="hrLogin()">Login</button>
+        <p id="hrMsg"></p>
+    </div>
+</section>
+
+<!-- HR DASHBOARD -->
+<section id="hrDashboard">
+    <div class="page-shell">
+        <h2 class="section-title">HR Dashboard</h2>
+        <p class="section-subtitle">Review applications, track test outcomes, and manage virtual round decisions.</p>
+
+        <div class="kpi-row">
+            <div class="card kpi-card">
+                <h3 id="pendingCount">0</h3>
+                <p>Pending Applications</p>
+            </div>
+            <div class="card kpi-card">
+                <h3 id="selectedCount">0</h3>
+                <p>Selected Candidates</p>
+            </div>
+            <div class="card kpi-card">
+                <h3 id="rejectedCount">0</h3>
+                <p>Rejected Candidates</p>
+            </div>
+        </div>
+    
+        <div class="card hr-block">
+            <h3>Applications</h3>
+            <div class="table-shell">
+                <div id="pendingTable"></div>
+            </div>
+        </div>
+
+        <div class="round-grid">
+            <div class="card hr-block">
+                <h3>Selected For Round 1 (MCQ)</h3>
+                <p class="muted-note">Candidates accepted by HR and currently in first-round process.</p>
+                <div class="table-shell">
+                    <div id="round1Table"></div>
+                </div>
+            </div>
+
+            <div class="card hr-block">
+                <h3>Selected For Round 2 (Virtual)</h3>
+                <p class="muted-note">Candidates promoted to virtual round or completed second round.</p>
+                <div class="table-shell">
+                    <div id="round2Table"></div>
+                </div>
+            </div>
+
+            <div class="card hr-block">
+                <h3>Rejected Candidates</h3>
+                <div class="table-shell">
+                    <div id="rejectedTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultModalBackdrop" class="modal-backdrop" onclick="closeResultModal(event)">
+        <div class="result-modal" onclick="event.stopPropagation()">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <h3 id="resultModalTitle">Candidate Result</h3>
+                <button onclick="closeResultModal()">Close</button>
+            </div>
+            <div id="resultModalBody" style="margin-top:12px;"></div>
+        </div>
+    </div>
+    </section>
+    
+    
+
+
+
+
+<!-- CANDIDATE LOGIN -->
+
+
+<section id="candidateLogin">
+
+    <div class="card">
+        <h2>Candidate Login</h2>
+    
+        <input 
+            type="text" 
+            id="candidateUsername" 
+            placeholder="Enter Username"
+        >
+    
+        <input 
+            type="password" 
+            id="candidatePassword" 
+            placeholder="Enter Password"
+        >
+    
+        <button onclick="candidateLogin()">Login</button>
+    </div>
+    
+    </section>
+    
+
+    
+
+<!-- CANDIDATE DASHBOARD -->
+<section id="candidateDashboard">
+    <div class="page-shell">
+        <h2 class="section-title">Candidate Dashboard</h2>
+        <p class="section-subtitle">Complete your assessments in sequence and track your progress.</p>
+        <div class="card">
+            <div id="candidateContent">
+                <!-- Interview content or result will appear here -->
+            </div>
+        </div>
+    </div>
+    
+    </section>
+
+
+
+<script>
+
+let currentTestId = null;
+let virtualState = null;
+let mcqState = null;
+let hrCandidateCache = {};
+const MCQ_TOTAL_SECONDS = 30 * 60;
+const AVATAR_IMAGE_URL = "https://create-images-results.d-id.com/DefaultPresenters/Noelle_f/image.png";
+const PROCTORING_POLICY = {
+    "MCQ Interview": {
+        autoSubmitOnViolationNumber: 3
+    },
+    "Virtual Interview": {
+        // First violation warns. Second violation auto-submits.
+        autoSubmitOnViolationNumber: 2
+    }
+};
+let proctorState = {
+    active: false,
+    mode: null,
+    violations: 0,
+    onAutoSubmit: null,
+    lastViolationAt: 0
+};
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function formatTime(totalSeconds){
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+function formatErrorDetails(details){
+    if(!details){
+        return "";
+    }
+    if(typeof details === "string"){
+        return details;
+    }
+    if(Array.isArray(details)){
+        const lines = details
+            .slice(0, 5)
+            .map(item => {
+                if(typeof item === "string"){
+                    return item;
+                }
+                if(item && typeof item === "object"){
+                    const model = item.model ? `[${item.model}] ` : "";
+                    const message = item.error || item.details || JSON.stringify(item);
+                    return `${model}${message}`;
+                }
+                return String(item);
+            });
+        return lines.join("\n");
+    }
+    if(details && typeof details === "object"){
+        if(details.details){
+            return formatErrorDetails(details.details);
+        }
+        if(details.raw_output){
+            return String(details.raw_output).slice(0, 700);
+        }
+        return JSON.stringify(details);
+    }
+    return String(details);
+}
+
+function getNavigationType(){
+    const navEntries = performance.getEntriesByType ? performance.getEntriesByType("navigation") : [];
+    if(navEntries && navEntries.length){
+        return navEntries[0].type;
+    }
+    if(performance && performance.navigation){
+        return performance.navigation.type === 1 ? "reload" : "navigate";
+    }
+    return "navigate";
+}
+
+function setLogoutVisible(visible){
+    const btn = document.getElementById("logoutBtn");
+    if(!btn){
+        return;
+    }
+    btn.style.display = visible ? "inline-block" : "none";
+}
+
+function setPortalRole(role){
+    if(role){
+        localStorage.setItem("simuhire_role", role);
+    } else {
+        localStorage.removeItem("simuhire_role");
+    }
+}
+
+function clearInterviewProgressFlags(){
+    localStorage.removeItem("simuhire_mcq_in_progress");
+    localStorage.removeItem("simuhire_virtual_in_progress");
+}
+
+function markInterviewInProgress(kind, active){
+    const key = kind === "virtual" ? "simuhire_virtual_in_progress" : "simuhire_mcq_in_progress";
+    if(active){
+        localStorage.setItem(key, "1");
+    } else {
+        localStorage.removeItem(key);
+    }
+}
+
+async function restoreSessionUIAfterReload(){
+    setLogoutVisible(false);
+    try{
+        const res = await fetch("/api/session/status");
+        const data = await res.json();
+        if(!res.ok || !data.logged_in){
+            setPortalRole(null);
+            clearInterviewProgressFlags();
+            return;
+        }
+
+        const role = data.role || null;
+        setPortalRole(role);
+        setLogoutVisible(true);
+
+        const navType = getNavigationType();
+        if(navType === "reload"){
+            const roleLabel = role === "hr" ? "HR" : "Candidate";
+            const mcqInProgress = localStorage.getItem("simuhire_mcq_in_progress") === "1";
+            const virtualInProgress = localStorage.getItem("simuhire_virtual_in_progress") === "1";
+            if(role === "candidate" && (mcqInProgress || virtualInProgress)){
+                alert("Warning: Page was reloaded during an active interview. Continue immediately; repeated tab/window switches will auto-submit.");
+            } else {
+                alert(`Notice: ${roleLabel} portal was reloaded while logged in.`);
+            }
+        }
+    } catch(e){
+        setLogoutVisible(false);
+    }
+}
+
+function showLoader(){
+    const el = document.getElementById("globalLoader");
+    if(!el){
+        return;
+    }
+    const count = Number(el.dataset.count || "0") + 1;
+    el.dataset.count = String(count);
+    el.classList.add("show");
+}
+
+function hideLoader(){
+    const el = document.getElementById("globalLoader");
+    if(!el){
+        return;
+    }
+    const count = Math.max(0, Number(el.dataset.count || "0") - 1);
+    el.dataset.count = String(count);
+    if(count === 0){
+        el.classList.remove("show");
+    }
+}
+
+const __nativeFetch = window.fetch.bind(window);
+window.fetch = async (...args) => {
+    showLoader();
+    try{
+        return await __nativeFetch(...args);
+    } finally {
+        hideLoader();
+    }
+};
+
+function beginProctoring(mode, onAutoSubmit){
+    proctorState = {
+        active: true,
+        mode,
+        violations: 0,
+        onAutoSubmit,
+        lastViolationAt: 0
+    };
+}
+
+function endProctoring(){
+    proctorState = {
+        active: false,
+        mode: null,
+        violations: 0,
+        onAutoSubmit: null,
+        lastViolationAt: 0
+    };
+}
+
+function registerProctoringViolation(reason){
+    if(!proctorState.active){
+        return;
+    }
+    const now = Date.now();
+    if(now - proctorState.lastViolationAt < 1500){
+        return;
+    }
+    proctorState.lastViolationAt = now;
+    proctorState.violations += 1;
+    const policy = PROCTORING_POLICY[proctorState.mode] || {autoSubmitOnViolationNumber: 3};
+    const left = policy.autoSubmitOnViolationNumber - proctorState.violations;
+
+    if(left > 0){
+        alert(`Warning: Do not switch tabs/windows during ${proctorState.mode}.\nReason: ${reason}\nRemaining warnings: ${left}`);
+        return;
+    }
+
+    const autoSubmit = proctorState.onAutoSubmit;
+    const mode = proctorState.mode;
+    const violationCount = proctorState.violations;
+    endProctoring();
+    alert(`You switched away from the exam window multiple times. ${mode} is being auto-submitted.`);
+    if(typeof autoSubmit === "function"){
+        autoSubmit(true, true, violationCount);
+    }
+}
+
+document.addEventListener("visibilitychange", () => {
+    if(!proctorState.active){
+        return;
+    }
+    if(document.hidden){
+        registerProctoringViolation("Tab/window hidden");
+    }
+});
+
+window.addEventListener("blur", () => {
+    if(!proctorState.active){
+        return;
+    }
+    registerProctoringViolation("Window focus lost");
+});
+
+function showSection(id) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+restoreSessionUIAfterReload();
+
+/* APPLY */
+document.getElementById("applyForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    const fd = new FormData(this);
+    const res = await fetch("/api/apply", {method:"POST", body: fd});
+    const data = await res.json();
+    const msgEl = document.getElementById("applyMsg");
+    msgEl.innerText = data.message || data.error;
+    msgEl.style.color = res.ok ? "#166534" : "#b91c1c";
+    if(res.ok){
+        this.reset();
+    }
+});
+
+document.getElementById("applyForm").addEventListener("keydown", function(e){
+    if(e.key !== "Enter"){
+        return;
+    }
+    const tag = String(e.target?.tagName || "").toLowerCase();
+    if(tag === "textarea"){
+        return;
+    }
+    e.preventDefault();
+    this.requestSubmit();
+});
+
+/* HR LOGIN */
+async function hrLogin(){
+    const res = await fetch("/api/admin/login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            username: document.getElementById("hrUser").value,
+            password: document.getElementById("hrPass").value
+        })
+    });
+    const data = await res.json();
+    if(res.ok){
+        setPortalRole("hr");
+        setLogoutVisible(true);
+        clearInterviewProgressFlags();
+        loadCandidates();
+        showSection("hrDashboard");
+    } else {
+        document.getElementById("hrMsg").innerText = data.error;
+    }
+}
+
+async function loadCandidates(){
+    
+    if(!document.getElementById("pendingTable")) return;
+
+    const res = await fetch("/api/admin/applications");
+    const data = await res.json();
+
+    if(!res.ok){
+        alert(data.error || "Failed to load HR dashboard data");
+        return;
+    }
+
+    const pending = Array.isArray(data.pending) ? data.pending : [];
+    const selected = Array.isArray(data.selected) ? data.selected : [];
+    const rejectedApps = Array.isArray(data.rejected) ? data.rejected : [];
+    hrCandidateCache = {};
+    selected.forEach(c => {
+        if(c?._id){
+            hrCandidateCache[c._id] = c;
+        }
+    });
+
+    const rejectedFromPipeline = selected.filter(c =>
+        c.status === "rejected" || (c.virtual_decision || "") === "rejected"
+    );
+    const activeSelected = selected.filter(c =>
+        c.status !== "rejected" && (c.virtual_decision || "") !== "rejected"
+    );
+    const round1Candidates = activeSelected.filter(c => !c.virtual_round_enabled && !c.virtual_taken);
+    const round2Candidates = activeSelected.filter(c => c.virtual_round_enabled || c.virtual_taken);
+
+    document.getElementById("pendingCount").innerText = pending.length;
+    document.getElementById("selectedCount").innerText = activeSelected.length;
+    document.getElementById("rejectedCount").innerText = rejectedApps.length + rejectedFromPipeline.length;
+
+    let pendingHTML = '<table class="data-table"><tr><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr>';
+    pending.forEach(c=>{
+        pendingHTML += `
+        <tr>
+            <td>${escapeHtml(`${c.first_name || ""} ${c.last_name || ""}`.trim())}</td>
+            <td>${escapeHtml(c.email || "-")}</td>
+            <td class="role-cell">${escapeHtml(c.job_role || "-")}</td>
+            <td class="actions-cell">
+                <div class="table-actions">
+                    <a href="/resume/${encodeURIComponent(c.resume || "")}" target="_blank" class="resume-btn">View Resume</a>
+                    <button onclick="accept('${c._id}')">Accept</button>
+                    <button onclick="reject('${c._id}')" class="btn-danger">Reject</button>
+                </div>
+            </td>
+        </tr>`;
+    });
+    pendingHTML += "</table>";
+    document.getElementById("pendingTable").innerHTML = pendingHTML;
+
+    let round1HTML = '<table class="data-table"><tr><th>Candidate</th><th>Role</th><th>Round 1 Status</th><th>Actions</th></tr>';
+    if(round1Candidates.length === 0){
+        round1HTML += '<tr><td colspan="4">No candidates currently in Round 1.</td></tr>';
+    } else {
+        round1Candidates.forEach(c => {
+            const decision = c.virtual_decision || "pending";
+            const canDecideVirtual = c.interview_taken && !c.virtual_taken && !c.virtual_round_enabled && decision !== "rejected";
+            const mcqStatus = c.interview_taken
+                ? `<span class="candidate-pill">Completed (${c.score ?? "-"}/10)</span>`
+                : `<span class="candidate-pill">Waiting Candidate Attempt</span>`;
+
+            round1HTML += `
+            <tr>
+                <td>
+                    <b>${escapeHtml(c.username || "-")}</b><br>
+                    <span class="muted-note">${escapeHtml(c.email || "-")}</span>
+                </td>
+                <td>${escapeHtml(c.job_role || "-")}</td>
+                <td>${mcqStatus}</td>
+                <td class="actions-cell">
+                    <div class="table-actions">
+                        <a href="/resume/${encodeURIComponent(c.resume || "")}" target="_blank" class="resume-btn">View Resume</a>
+                        <button onclick="openCandidateResult('${c._id}')">View Result</button>
+                        ${canDecideVirtual ? `<button onclick="promoteVirtual('${c._id}')">Promote To Round 2</button>` : ""}
+                        ${canDecideVirtual ? `<button onclick="rejectAfterMcq('${c._id}')" class="btn-danger">Remove</button>` : ""}
+                    </div>
+                </td>
+            </tr>`;
+        });
+    }
+    round1HTML += "</table>";
+    document.getElementById("round1Table").innerHTML = round1HTML;
+
+    let round2HTML = '<table class="data-table"><tr><th>Candidate</th><th>Role</th><th>Round 2 Status</th><th>Actions</th></tr>';
+    if(round2Candidates.length === 0){
+        round2HTML += '<tr><td colspan="4">No candidates currently in Round 2.</td></tr>';
+    } else {
+        round2Candidates.forEach(c => {
+            const statusText = c.virtual_taken
+                ? `<span class="candidate-pill">Completed (${c.virtual_score ?? "-"}/10)</span>`
+                : `<span class="candidate-pill">Promoted - Pending Attempt</span>`;
+            round2HTML += `
+            <tr>
+                <td>
+                    <b>${escapeHtml(c.username || "-")}</b><br>
+                    <span class="muted-note">${escapeHtml(c.email || "-")}</span>
+                </td>
+                <td>${escapeHtml(c.job_role || "-")}</td>
+                <td>${statusText}</td>
+                <td class="actions-cell">
+                    <div class="table-actions">
+                        <a href="/resume/${encodeURIComponent(c.resume || "")}" target="_blank" class="resume-btn">View Resume</a>
+                        <button onclick="openCandidateResult('${c._id}')">View Result</button>
+                        ${!c.virtual_taken ? `<button onclick="rejectAfterMcq('${c._id}')" class="btn-danger">Remove</button>` : ""}
+                    </div>
+                </td>
+            </tr>`;
+        });
+    }
+    round2HTML += "</table>";
+    document.getElementById("round2Table").innerHTML = round2HTML;
+
+    const rejectedCombined = [];
+    rejectedApps.forEach(item => rejectedCombined.push({
+        name: `${item.first_name || ""} ${item.last_name || ""}`.trim(),
+        email: item.email || "-",
+        reason: "Application rejected"
+    }));
+    rejectedFromPipeline.forEach(item => rejectedCombined.push({
+        name: item.username || `${item.first_name || ""} ${item.last_name || ""}`.trim(),
+        email: item.email || "-",
+        reason: "Removed after interview review"
+    }));
+
+    let rejectedHTML = '<table class="data-table"><tr><th>Name</th><th>Email</th><th>Reason</th></tr>';
+    if(rejectedCombined.length === 0){
+        rejectedHTML += '<tr><td colspan="3">No rejected candidates.</td></tr>';
+    } else {
+        rejectedCombined.forEach(c=>{
+            rejectedHTML += `
+            <tr>
+                <td>${escapeHtml(c.name || "-")}</td>
+                <td>${escapeHtml(c.email || "-")}</td>
+                <td>${escapeHtml(c.reason || "-")}</td>
+            </tr>`;
+        });
+    }
+    rejectedHTML += "</table>";
+    document.getElementById("rejectedTable").innerHTML = rejectedHTML;
+}
+
+function openCandidateResult(candidateId){
+    const c = hrCandidateCache[candidateId];
+    if(!c){
+        alert("Candidate data not available. Please refresh dashboard.");
+        return;
+    }
+
+    document.getElementById("resultModalTitle").innerText = `Result: ${c.username || c.email || "Candidate"}`;
+    const answeredCount = Array.isArray(c.candidate_answers)
+        ? c.candidate_answers.filter(a => a && a.answer !== null && a.answer !== undefined).length
+        : 0;
+    const totalMcq = Number(c.mcq_total_questions || (Array.isArray(c.questions_data) ? c.questions_data.length : 0) || 0);
+    const virtualStatus = c.virtual_taken
+        ? `Completed (${c.virtual_score ?? "-"}/10)`
+        : c.virtual_round_enabled
+            ? "Promoted - pending candidate attempt"
+            : "Not started";
+
+    let html = `
+    <div class="result-grid">
+        <div class="result-tile">
+            <h4>MCQ Score</h4>
+            <p>${c.score ?? "-"} / 10</p>
+        </div>
+        <div class="result-tile">
+            <h4>Answered Questions</h4>
+            <p>${answeredCount} / ${totalMcq || "-"}</p>
+        </div>
+        <div class="result-tile">
+            <h4>Virtual Round</h4>
+            <p>${escapeHtml(virtualStatus)}</p>
+        </div>
+        <div class="result-tile">
+            <h4>Virtual Feedback</h4>
+            <p>${escapeHtml(c.virtual_feedback || "-")}</p>
+        </div>
+    </div>
+    `;
+
+    if(Array.isArray(c.questions_data) && c.questions_data.length){
+        html += "<h4>MCQ Review</h4>";
+        c.questions_data.forEach(q => {
+            const userAnswer = Array.isArray(c.candidate_answers)
+                ? c.candidate_answers.find(a => a.id === q.id)
+                : null;
+            html += `
+            <div class="review-card">
+                <p><strong>${escapeHtml(q.question)}</strong></p>
+            `;
+            (q.options || []).forEach((opt, i) => {
+                let style = "";
+                if(i === q.answer){
+                    style = "color:#16a34a;font-weight:700;";
+                }
+                if(userAnswer && userAnswer.answer === i && i !== q.answer){
+                    style = "color:#dc2626;font-weight:700;";
+                }
+                html += `<p style="${style}">${escapeHtml(opt)}</p>`;
+            });
+            html += "</div>";
+        });
+    } else {
+        html += `<p class="muted-note">MCQ review is not available yet for this candidate.</p>`;
+    }
+
+    document.getElementById("resultModalBody").innerHTML = html;
+    document.getElementById("resultModalBackdrop").classList.add("show");
+}
+
+function closeResultModal(event){
+    if(event && event.target && event.target.id !== "resultModalBackdrop"){
+        return;
+    }
+    document.getElementById("resultModalBackdrop").classList.remove("show");
+}
+
+document.addEventListener("keydown", (event) => {
+    if(event.key === "Escape"){
+        closeResultModal();
+    }
+});
+
+
+async function accept(id){
+    await fetch("/api/admin/accept/"+id, {method:"POST"});
+    loadCandidates();
+}
+
+
+async function reject(id){
+    await fetch("/api/admin/reject/"+id, {method:"POST"});
+    loadCandidates();
+}
+
+async function promoteVirtual(id){
+    const ok = confirm("Promote this candidate to virtual interview round?");
+    if(!ok) return;
+
+    const res = await fetch("/api/admin/virtual/promote/"+id, {method:"POST"});
+    const data = await res.json();
+    alert(data.message || data.error || "Updated");
+    loadCandidates();
+}
+
+async function rejectAfterMcq(id){
+    const ok = confirm("Remove this candidate from further rounds?");
+    if(!ok) return;
+
+    const res = await fetch("/api/admin/virtual/reject/"+id, {method:"POST"});
+    const data = await res.json();
+    alert(data.message || data.error || "Updated");
+    loadCandidates();
+}
+
+
+/* CANDIDATE LOGIN */
+async function candidateLogin(){
+
+const usernameInput = document.getElementById("candidateUsername");
+const passwordInput = document.getElementById("candidatePassword");
+
+if(!usernameInput || !passwordInput){
+    alert("Login form not loaded properly.");
+    return;
+}
+
+const username = usernameInput.value.trim();
+const password = passwordInput.value.trim();
+
+if(!username || !password){
+    alert("Please enter username and password");
+    return;
+}
+
+const res = await fetch("/api/candidate/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+});
+
+const data = await res.json();
+
+if(data.error){
+    const extra = formatErrorDetails(data.details);
+    alert(extra ? `${data.error}\n${extra}` : data.error);
+    return;
+}
+
+setPortalRole("candidate");
+setLogoutVisible(true);
+if(data.interview_taken){
+    markInterviewInProgress("mcq", false);
+}
+if(data.virtual_taken){
+    markInterviewInProgress("virtual", false);
+}
+
+showSection("candidateDashboard");
+
+if(data.interview_taken && data.virtual_round_enabled && !data.virtual_taken){
+    document.getElementById("candidateContent").innerHTML =
+        `<h3>MCQ Completed</h3>
+         <p>Your Score: ${data.score}/10</p>
+         <p>MCQ Questions Attempted: ${data.mcq_total_questions || "-"}</p>
+         <button onclick="startVirtualInterview()" class="submit-btn">Start Virtual Interview</button>`;
+}
+else if(data.interview_taken && data.virtual_taken){
+    document.getElementById("candidateContent").innerHTML =
+        `<h3>Interview Process Completed</h3>
+         <p>MCQ Score: ${data.score}/10</p>
+         <p>MCQ Questions: ${data.mcq_total_questions || "-"}</p>
+         <p>Virtual Score: ${data.virtual_score ?? "-"}/10</p>
+         <p>${escapeHtml(data.virtual_feedback || "")}</p>`;
+}
+else if(data.interview_taken && (data.virtual_decision === "rejected" || data.status === "rejected")){
+    document.getElementById("candidateContent").innerHTML =
+        `<h3>Interview Update</h3>
+         <p>Your MCQ Score: ${data.score}/10</p>
+         <p>MCQ Questions: ${data.mcq_total_questions || "-"}</p>
+         <p>We will get back to you.</p>`;
+}
+else if(data.interview_taken){
+    document.getElementById("candidateContent").innerHTML =
+        `<h3>Interview Completed</h3>
+         <p>Your MCQ Score: ${data.score}/10</p>
+         <p>MCQ Questions: ${data.mcq_total_questions || "-"}</p>
+         <p>HR review is in progress. Wait for virtual round decision.</p>`;
+}
+else {
+    document.getElementById("candidateContent").innerHTML =
+        `<button onclick="startInterview()" class="submit-btn">Start Interview</button>`;
+}
+}
+
+function bindEnterSubmit(inputId, submitFn){
+    const inputEl = document.getElementById(inputId);
+    if(!inputEl){
+        return;
+    }
+    inputEl.addEventListener("keydown", (event) => {
+        if(event.key === "Enter"){
+            event.preventDefault();
+            submitFn();
+        }
+    });
+}
+
+bindEnterSubmit("hrUser", hrLogin);
+bindEnterSubmit("hrPass", hrLogin);
+bindEnterSubmit("candidateUsername", candidateLogin);
+bindEnterSubmit("candidatePassword", candidateLogin);
+
+
+/* START TEST */
+function ensureMcqTimerRunning(){
+    if(!mcqState || mcqState.timer){
+        return;
+    }
+    mcqState.timer = setInterval(() => {
+        if(!mcqState || mcqState.submitted){
+            clearInterval(mcqState?.timer);
+            return;
+        }
+
+        mcqState.remainingSeconds -= 1;
+        const timeEl = document.getElementById("mcqTimeLeft");
+        const fillEl = document.getElementById("mcqTimerFill");
+
+        if(timeEl){
+            timeEl.textContent = formatTime(Math.max(0, mcqState.remainingSeconds));
+        }
+        if(fillEl){
+            const percent = Math.max(0, (mcqState.remainingSeconds / MCQ_TOTAL_SECONDS) * 100);
+            fillEl.style.width = `${percent}%`;
+        }
+
+        if(mcqState.remainingSeconds <= 0){
+            clearInterval(mcqState.timer);
+            mcqState.timer = null;
+            submitTest(true, false, null);
+        }
+    }, 1000);
+}
+
+/* START INTERVIEW */
+async function startInterview(){
+
+endProctoring();
+if(mcqState?.timer){
+    clearInterval(mcqState.timer);
+}
+mcqState = null;
+
+const res = await fetch("/api/start_test", {
+    method: "POST"
+});
+
+const data = await res.json();
+
+if(data.error){
+    const extra = formatErrorDetails(data.details);
+    alert(extra ? `${data.error}\n${extra}` : data.error);
+    return;
+}
+
+currentTestId = data.test_id;
+const totalQuestions = Number(data.total_questions || (Array.isArray(data.questions) ? data.questions.length : 0) || 0);
+markInterviewInProgress("mcq", true);
+mcqState = {
+    remainingSeconds: MCQ_TOTAL_SECONDS,
+    timer: null,
+    submitted: false
+};
+
+let html = `
+<div class="virtual-avatar-wrap">
+    <h3>MCQ Interview (${totalQuestions} Questions)</h3>
+    <div class="virtual-meta">Total Time Left: <span id="mcqTimeLeft">${formatTime(MCQ_TOTAL_SECONDS)}</span></div>
+    <div class="virtual-timer">
+        <div class="virtual-timer-fill" id="mcqTimerFill" style="width:100%"></div>
+    </div>
+    <div class="virtual-meta">
+        Proctoring Rules: Stay on this window during the test. First two violations show warnings; on the third violation the test auto-submits.
+    </div>
+</div>
+`;
+
+data.questions.forEach((q, index) => {
+const safeQuestion = escapeHtml(q.question);
+
+html += `
+<div class="question-card" data-id="${q.id}">
+    <div class="question-header">
+        <span>Question ${index + 1}</span>
+    </div>
+
+    <div class="question-text">
+        ${safeQuestion}
+    </div>
+
+    <div class="options">
+`;
+
+q.options.forEach((opt, i) => {
+    const safeOption = escapeHtml(opt);
+    html += `
+    <label class="option-item">
+        <input type="radio" name="q${q.id}" value="${i}">
+        <span>${safeOption}</span>
+    </label>
+    `;
+});
+
+html += `
+    </div>
+</div>
+`;
+});
+
+html += `<button onclick="submitTest()" class="submit-btn">Submit Interview</button>`;
+
+document.getElementById("candidateContent").innerHTML = html;
+beginProctoring("MCQ Interview", (autoTriggered, forcedByProctoring, violationCount) => submitTest(autoTriggered, forcedByProctoring, violationCount));
+ensureMcqTimerRunning();
+}
+
+/* SUBMIT TEST */
+async function submitTest(autoTriggered = false, forcedByProctoring = false, proctoringViolationCount = null){
+
+if(mcqState?.submitted){
+    return;
+}
+
+let answers = [];
+
+document.querySelectorAll(".question-card").forEach(q => {
+
+    const id = parseInt(q.dataset.id);
+    const selected = q.querySelector("input:checked");
+
+    answers.push({
+        id: id,
+        answer: selected ? parseInt(selected.value) : null
+    });
+});
+
+const unansweredCount = answers.filter(a => a.answer === null || a.answer === undefined).length;
+if(!autoTriggered && unansweredCount > 0){
+    const proceed = confirm(`You have ${unansweredCount} unanswered question(s). Submit interview anyway?`);
+    if(!proceed){
+        return;
+    }
+}
+
+if(mcqState){
+    mcqState.submitted = true;
+    if(mcqState.timer){
+        clearInterval(mcqState.timer);
+        mcqState.timer = null;
+    }
+}
+
+const res = await fetch("/api/submit_test", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        test_id: currentTestId,
+        answers: answers,
+        proctoring_violations: Number.isFinite(proctoringViolationCount)
+            ? proctoringViolationCount
+            : (proctorState.active && proctorState.mode === "MCQ Interview" ? proctorState.violations : 0)
+    })
+});
+
+const data = await res.json();
+
+if(data.error){
+    const extra = formatErrorDetails(data.details);
+    alert(extra ? `${data.error}\n${extra}` : data.error);
+    if(forcedByProctoring){
+        endProctoring();
+    }
+    if(mcqState){
+        mcqState.submitted = false;
+        ensureMcqTimerRunning();
+    }
+    return;
+}
+endProctoring();
+
+document.getElementById("candidateContent").innerHTML = `
+    <h3>Interview Completed</h3>
+    <p>Your Score: ${data.score}/10</p>
+    <p>Raw Score: ${data.raw_score ?? "-"} / ${data.total_questions ?? "-"}</p>
+    ${autoTriggered ? "<p>Interview was auto-submitted.</p>" : ""}
+    <p>HR will review your MCQ interview and decide the virtual round.</p>
+`;
+markInterviewInProgress("mcq", false);
+mcqState = null;
+}
+
+function logout(){
+    stopVirtualRecognition();
+    stopVirtualMedia();
+    endProctoring();
+    if(window.speechSynthesis){
+        window.speechSynthesis.cancel();
+    }
+    if(mcqState?.timer){
+        clearInterval(mcqState.timer);
+    }
+    setPortalRole(null);
+    clearInterviewProgressFlags();
+    setLogoutVisible(false);
+    virtualState = null;
+    mcqState = null;
+    fetch("/api/logout").then(()=>{
+        showSection("landing");
+    });
+}
+
+
+function stopVirtualMedia(){
+    if(virtualState?.mediaStream){
+        virtualState.mediaStream.getTracks().forEach(track => {
+            try { track.stop(); } catch(e) {}
+        });
+    }
+    if(virtualState){
+        virtualState.mediaStream = null;
+    }
+}
+
+function stopVirtualRecognition(){
+    if(virtualState?.recognition){
+        try { virtualState.recognition.stop(); } catch(e) {}
+    }
+    if(virtualState){
+        virtualState.recognition = null;
+    }
+}
+
+function speakAvatar(text){
+    if(!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 1;
+    window.speechSynthesis.speak(utterance);
+}
+
+function attachVirtualMediaPreview(){
+    const preview = document.getElementById("candidateLivePreview");
+    if(preview && virtualState?.mediaStream){
+        preview.srcObject = virtualState.mediaStream;
+        preview.play().catch(() => {});
+    }
+}
+
+async function initVirtualMedia(){
+    if(!virtualState){
+        return false;
+    }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        return false;
+    }
+
+    if(!virtualState.mediaStream){
+        try{
+            virtualState.mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            });
+        } catch(e){
+            return false;
+        }
+    }
+    attachVirtualMediaPreview();
+    return true;
+}
+
+function saveCurrentVirtualAnswer(){
+    if(!virtualState){
+        return;
+    }
+    const box = document.getElementById("virtualAnswerBox");
+    if(!box){
+        return;
+    }
+    virtualState.answers[virtualState.currentIndex] = String(box.value || "").trim();
+}
+
+function startVirtualRecognitionForBox(answerBox){
+    stopVirtualRecognition();
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SpeechRecognition || !answerBox){
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    recognition.onresult = function(event){
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        answerBox.value = `${answerBox.value} ${transcript}`.trim();
+        saveCurrentVirtualAnswer();
+    };
+    recognition.onerror = function(){};
+    try { recognition.start(); } catch(e) {}
+    virtualState.recognition = recognition;
+}
+
+function renderVirtualInterviewStep(){
+    const container = document.getElementById("candidateContent");
+    const idx = virtualState.currentIndex;
+    const total = virtualState.questions.length;
+    const q = virtualState.questions[idx];
+    const savedAnswer = virtualState.answers[idx] || "";
+
+    container.innerHTML = `
+        <div class="virtual-avatar-wrap">
+            <h3>AI Avatar Virtual Interview</h3>
+            <div class="virtual-meta">Question ${idx + 1} of ${total}</div>
+            <div class="virtual-meta">Proctoring Rules: Stay on this window. First switch gives a warning; second switch auto-submits.</div>
+            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div class="virtual-avatar" id="virtualAvatarFace">
+                    <img src="${AVATAR_IMAGE_URL}" alt="AI Avatar">
+                </div>
+                <div>
+                    <div class="virtual-meta"><b>Candidate Live Feed</b></div>
+                    <video id="candidateLivePreview" class="candidate-live-video" autoplay muted playsinline></video>
+                </div>
+            </div>
+            <div id="avatarStatus" class="virtual-meta">Avatar is ready.</div>
+            <div id="avatarResponseText" class="virtual-meta"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+                <button class="submit-btn" onclick="askCurrentVirtualQuestion()">Ask Question</button>
+                <button class="submit-btn" onclick="startMicForCurrentQuestion()">Start Mic</button>
+                <button class="submit-btn" onclick="stopVirtualRecognition()">Stop Mic</button>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question-text">${escapeHtml(q)}</div>
+            <p class="virtual-meta">Answer the question below. You can type or use microphone.</p>
+            <textarea id="virtualAnswerBox" class="virtual-answer-box" placeholder="Type or speak your answer...">${escapeHtml(savedAnswer)}</textarea>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+                <button class="submit-btn" onclick="prevVirtualQuestion()" ${idx === 0 ? "disabled" : ""}>Previous</button>
+                ${idx < total - 1
+                    ? `<button class="submit-btn" onclick="nextVirtualQuestion()">Next Question</button>`
+                    : `<button class="submit-btn" onclick="completeVirtualInterview(false)">Submit Virtual Interview</button>`}
+            </div>
+        </div>
+    `;
+
+    const answerBox = document.getElementById("virtualAnswerBox");
+    answerBox.addEventListener("input", saveCurrentVirtualAnswer);
+    answerBox.focus();
+    attachVirtualMediaPreview();
+    askCurrentVirtualQuestion();
+}
+
+async function nextVirtualQuestion(){
+    if(!virtualState || virtualState.submitted){
+        return;
+    }
+    saveCurrentVirtualAnswer();
+    await avatarRespondToCurrentAnswer();
+    if(virtualState.currentIndex < virtualState.questions.length - 1){
+        virtualState.currentIndex += 1;
+        renderVirtualInterviewStep();
+    }
+}
+
+function prevVirtualQuestion(){
+    if(!virtualState || virtualState.submitted){
+        return;
+    }
+    saveCurrentVirtualAnswer();
+    if(virtualState.currentIndex > 0){
+        virtualState.currentIndex -= 1;
+        renderVirtualInterviewStep();
+    }
+}
+
+function setAvatarSpeaking(isSpeaking){
+    const face = document.getElementById("virtualAvatarFace");
+    if(!face){
+        return;
+    }
+    if(isSpeaking){
+        face.classList.add("speaking");
+    } else {
+        face.classList.remove("speaking");
+    }
+}
+
+function startMicForCurrentQuestion(){
+    if(!virtualState || virtualState.submitted){
+        return;
+    }
+    const answerBox = document.getElementById("virtualAnswerBox");
+    if(!answerBox){
+        return;
+    }
+    startVirtualRecognitionForBox(answerBox);
+    const statusEl = document.getElementById("avatarStatus");
+    if(statusEl){
+        statusEl.textContent = "Listening to candidate response...";
+    }
+}
+
+function askCurrentVirtualQuestion(){
+    if(!virtualState || virtualState.submitted){
+        return;
+    }
+    stopVirtualRecognition();
+    const q = virtualState.questions[virtualState.currentIndex];
+    const statusEl = document.getElementById("avatarStatus");
+    setAvatarSpeaking(true);
+    if(statusEl){
+        statusEl.textContent = "Avatar is asking the question...";
+    }
+
+    if(!window.speechSynthesis){
+        setAvatarSpeaking(false);
+        if(statusEl){
+            statusEl.textContent = "Speech synthesis unavailable. Please read the question and answer.";
+        }
+        startMicForCurrentQuestion();
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(q);
+    utterance.lang = "en-US";
+    utterance.rate = 1;
+    utterance.onend = function(){
+        setAvatarSpeaking(false);
+        if(statusEl){
+            statusEl.textContent = "Please answer now. Microphone started.";
+        }
+        startMicForCurrentQuestion();
+    };
+    window.speechSynthesis.speak(utterance);
+}
+
+async function avatarRespondToCurrentAnswer(){
+    if(!virtualState || virtualState.submitted){
+        return;
+    }
+    const question = virtualState.questions[virtualState.currentIndex];
+    const answer = String(virtualState.answers[virtualState.currentIndex] || "").trim();
+    if(!answer){
+        return;
+    }
+
+    const statusEl = document.getElementById("avatarStatus");
+    const respEl = document.getElementById("avatarResponseText");
+    if(statusEl){
+        statusEl.textContent = "Avatar is reviewing your answer...";
+    }
+
+    const res = await fetch("/api/virtual/respond", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({question, answer})
+    });
+    const data = await res.json();
+
+    if(data.error){
+        if(statusEl){
+            statusEl.textContent = "Could not generate avatar response.";
+        }
+        return;
+    }
+
+    const responseText = String(data.response_text || "").trim();
+    if(responseText){
+        if(respEl){
+            respEl.textContent = `HR: ${responseText}`;
+        }
+        setAvatarSpeaking(true);
+        if(window.speechSynthesis){
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(responseText);
+            utterance.lang = "en-US";
+            utterance.rate = 1;
+            utterance.onend = function(){
+                setAvatarSpeaking(false);
+                if(statusEl){
+                    statusEl.textContent = "Proceed to next question when ready.";
+                }
+            };
+            window.speechSynthesis.speak(utterance);
+        } else {
+            setAvatarSpeaking(false);
+        }
+    }
+}
+
+async function completeVirtualInterview(autoTriggered = false, forcedByProctoring = false, proctoringViolationCount = null){
+    if(!virtualState || virtualState.submitted){
+        return;
+    }
+    saveCurrentVirtualAnswer();
+    const answers = virtualState.answers.map(a => String(a || "").trim());
+    const unansweredCount = answers.filter(a => !a).length;
+    if(!autoTriggered && unansweredCount > 0){
+        const proceed = confirm(`You have ${unansweredCount} unanswered virtual question(s). Submit anyway?`);
+        if(!proceed){
+            return;
+        }
+    }
+
+    virtualState.submitted = true;
+    stopVirtualRecognition();
+    stopVirtualMedia();
+
+    const durationSeconds = Math.floor((Date.now() - virtualState.startedAt) / 1000);
+
+    const res = await fetch("/api/virtual/submit", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            answers: answers,
+            duration_seconds: durationSeconds,
+            proctoring_violations: Number.isFinite(proctoringViolationCount)
+                ? proctoringViolationCount
+                : (proctorState.active && proctorState.mode === "Virtual Interview" ? proctorState.violations : 0),
+            auto_submitted: Boolean(autoTriggered || forcedByProctoring)
+        })
+    });
+
+    const data = await res.json();
+    if(data.error){
+        const extra = formatErrorDetails(data.details);
+        alert(extra ? `${data.error}\n${extra}` : data.error);
+        if(forcedByProctoring){
+            endProctoring();
+        }
+        virtualState.submitted = false;
+        return;
+    }
+    endProctoring();
+
+    document.getElementById("candidateContent").innerHTML =
+    `<h3>Virtual Interview Submitted</h3>
+     <p>Your Virtual Score: ${data.score}/10</p>
+     ${autoTriggered ? "<p>Interview was auto-submitted.</p>" : ""}
+     <p>${escapeHtml(data.feedback || "Thank you. We will get back to you.")}</p>`;
+    markInterviewInProgress("virtual", false);
+    virtualState = null;
+}
+
+async function startVirtualInterview(){
+    endProctoring();
+    stopVirtualRecognition();
+    stopVirtualMedia();
+    virtualState = null;
+
+    const res = await fetch("/api/virtual/questions", {method:"POST"});
+    const data = await res.json();
+    if(data.error){
+        const extra = formatErrorDetails(data.details);
+        alert(extra ? `${data.error}\n${extra}` : data.error);
+        return;
+    }
+
+    const questions = Array.isArray(data.questions) ? data.questions : [];
+    if(questions.length < 5){
+        alert("Virtual interview could not start. Expected at least 5 questions.");
+        return;
+    }
+
+    virtualState = {
+        questions,
+        answers: new Array(questions.length).fill(""),
+        currentIndex: 0,
+        recognition: null,
+        mediaStream: null,
+        startedAt: Date.now(),
+        submitted: false
+    };
+
+    const mediaReady = await initVirtualMedia();
+    if(!mediaReady){
+        alert("Camera and microphone access is required for virtual interview. Please allow permissions and retry.");
+        stopVirtualRecognition();
+        stopVirtualMedia();
+        virtualState = null;
+        return;
+    }
+    markInterviewInProgress("virtual", true);
+    renderVirtualInterviewStep();
+    beginProctoring("Virtual Interview", (autoTriggered, forcedByProctoring, violationCount) => completeVirtualInterview(autoTriggered, forcedByProctoring, violationCount));
+    startMicForCurrentQuestion();
+}
+
+
+</script>
+
+</body>
+</html>

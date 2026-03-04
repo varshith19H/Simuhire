@@ -1,0 +1,65 @@
+<!-- templates/admin_dashboard.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HR Dashboard — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h1>HR Dashboard</h1>
+      <div><a href="/admin/logout" class="btn">Logout</a></div>
+    </div>
+    <div class="card">
+      <h2>Applicants</h2>
+      <table style="width:100%; border-collapse: collapse;">
+        <thead>
+          <tr style="text-align:left;">
+            <th>Name</th><th>Email</th><th>Phone</th><th>Job Role</th><th>Status</th><th>Score</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for a in applicants %}
+          <tr style="border-top:1px solid rgba(255,255,255,0.04);">
+            <td>{{ a.first_name }} {{ a.middle_name }} {{ a.last_name }}</td>
+            <td>{{ a.email }}</td>
+            <td>{{ a.phone }}</td>
+            <td>{{ a.job_role }}</td>
+            <td>{{ a.status }}</td>
+            <td>{{ a.score if a.score else '-' }}</td>
+            <td>
+              <a href="/admin/view/{{ a._id }}" class="btn" style="margin-right:8px;">View</a>
+              {% if a.status != 'accepted' %}
+              <button onclick="accept('{{ a._id }}')" class="btn">Accept</button>
+              {% endif %}
+              {% if a.status != 'rejected' %}
+              <button onclick="reject('{{ a._id }}')" class="btn" style="background:#6b7280;">Reject</button>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+async function accept(id){
+  if(!confirm("Accept candidate? This will create an account and send credentials via email.")) return;
+  const resp = await fetch("/admin/accept/"+id, {method:"POST"});
+  const j = await resp.json();
+  alert(JSON.stringify(j));
+  location.reload();
+}
+async function reject(id){
+  if(!confirm("Reject candidate?")) return;
+  const resp = await fetch("/admin/reject/"+id, {method:"POST"});
+  const j = await resp.json();
+  alert(JSON.stringify(j));
+  location.reload();
+}
+</script>
+</body>
+</html>

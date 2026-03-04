@@ -1,0 +1,47 @@
+<!-- templates/admin_candidate.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Applicant — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <a href="/admin/dashboard" class="btn">← Back</a>
+    <div class="card">
+      <h2>Applicant Details</h2>
+      <p><strong>Name:</strong> {{ candidate.first_name }} {{ candidate.middle_name }} {{ candidate.last_name }}</p>
+      <p><strong>Email:</strong> {{ candidate.email }}</p>
+      <p><strong>Phone:</strong> {{ candidate.phone }}</p>
+      <p><strong>Job Role:</strong> {{ candidate.job_role }}</p>
+      <p><strong>Skills:</strong> {{ candidate.skills }}</p>
+      <p><strong>Status:</strong> {{ candidate.status }}</p>
+      <p><strong>Resume:</strong> <a href="/uploads/{{ candidate.resume_filename }}" target="_blank">Download</a></p>
+      <div style="margin-top:12px;">
+        {% if candidate.status != 'accepted' %}
+        <button onclick="accept('{{ candidate._id }}')" class="btn">Accept</button>
+        {% endif %}
+        {% if candidate.status != 'rejected' %}
+        <button onclick="reject('{{ candidate._id }}')" class="btn" style="background:#6b7280;">Reject</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+<script>
+async function accept(id){
+  const resp = await fetch("/admin/accept/"+id, {method:"POST"});
+  const j = await resp.json();
+  alert(JSON.stringify(j));
+  location.href="/admin/dashboard";
+}
+async function reject(id){
+  const resp = await fetch("/admin/reject/"+id, {method:"POST"});
+  const j = await resp.json();
+  alert(JSON.stringify(j));
+  location.href="/admin/dashboard";
+}
+</script>
+</body>
+</html>

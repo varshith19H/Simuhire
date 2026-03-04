@@ -1,0 +1,81 @@
+<!-- templates/candidate_test.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Interview — SimuHire</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <a href="/candidate/dashboard" class="btn">← Back</a>
+    </div>
+
+    <div class="card">
+      <h2>Interview Questions</h2>
+      <div id="questionsContainer"></div>
+      <div style="text-align:center; margin-top:1rem;">
+        <button id="submitAnswersBtn" class="btn">Submit Answers</button>
+      </div>
+      <div id="result"></div>
+    </div>
+  </div>
+
+<script>
+const payload = JSON.parse(sessionStorage.getItem("test_payload") || "null");
+if(!payload){
+  alert("No test found. Go to dashboard and start test.");
+  window.location.href="/candidate/dashboard";
+}
+const testId = payload.test_id;
+const questions = payload.questions;
+
+const questionsContainer = document.getElementById("questionsContainer");
+questions.forEach((q, idx) => {
+  const qBox = document.createElement("div");
+  qBox.className = "question-box";
+  qBox.innerHTML = `
+      <div class="q-number">Q${idx+1}</div>
+      <div class="q-text">${q.question}</div>
+      <div class="options" id="opts-${q.id}"></div>
+    `;
+  const optsDiv = qBox.querySelector(`#opts-${q.id}`);
+  q.options.forEach((opt, i) => {
+    const optHtml = document.createElement("label");
+    optHtml.className = "option-label";
+    optHtml.innerHTML = `
+        <input type="radio" name="q${q.id}" value="${i}" />
+        <span>${String.fromCharCode(65+i)}. ${opt}</span>
+    `;
+    optsDiv.appendChild(optHtml);
+  });
+  questionsContainer.appendChild(qBox);
+});
+
+document.getElementById("submitAnswersBtn").addEventListener("click", async () => {
+  const answers = questions.map(q => {
+    const radios = document.getElementsByName(`q${q.id}`);
+    let chosen = null;
+    for (let r of radios) if(r.checked) { chosen = parseInt(r.value); break; }
+    return { id: q.id, answer: chosen };
+  });
+
+  const resp = await fetch("/candidate/submit_test", {
+    method: "POST",
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ test_id: testId, answers })
+  });
+  const j = await resp.json();
+  if(j.error){ alert("Error: "+j.error); return; }
+  // Clear session test payload
+  sessionStorage.removeItem("test_payload");
+  // show results
+  let html = `<h3>Score: ${j.local.score} / ${j.local.total}</h3>`;
+  if(j.ai && j.ai.score !== undefined){ html += `<p>AI Score: ${j.ai.score} / ${j.ai.total}</p>`; }
+  if(j.ai && j.ai.details){ html += `<pre>${JSON.stringify(j.ai.details, null, 2)}</pre>`; }
+  document.getElementById("result").innerHTML = html;
+});
+</script>
+</body>
+</html>
