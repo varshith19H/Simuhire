@@ -6,23 +6,29 @@ import json
 import requests
 from datetime import datetime
 from email.message import EmailMessage
+from urllib.parse import unquote
 
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-from flask import send_from_directory
 from config import Config
 from ai.hf_generator import generate_mcq
+import cloudinary
+import cloudinary.uploader
 
 
 app = Flask(__name__)
-app.config["UPLOAD_FOLDER"] = Config.UPLOAD_FOLDER
 app.secret_key = os.getenv("FLASK_SECRET", "super_secret_key")
 CORS(app)
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+cloudinary.config(
+    cloud_name=Config.CLOUDINARY_CLOUD_NAME,
+    api_key=Config.CLOUDINARY_API_KEY,
+    api_secret=Config.CLOUDINARY_API_SECRET,
+    secure=True
+)
 
 # -------------------------------
 # MongoDB Atlas Connection
@@ -42,6 +48,31 @@ def parse_object_id(value):
         return ObjectId(value)
     except Exception:
         return None
+
+
+def upload_resume_to_cloudinary(resume_file):
+    if not (Config.CLOUDINARY_CLOUD_NAME and Config.CLOUDINARY_API_KEY and Config.CLOUDINARY_API_SECRET):
+        return None, "Cloudinary credentials are not configured"
+
+    original = secure_filename(resume_file.filename or "resume.pdf")
+    base_name = os.path.splitext(original)[0] or "resume"
+    public_id = f"{uuid.uuid4().hex}_{base_name}"
+
+    try:
+        result = cloudinary.uploader.upload(
+            resume_file,
+            resource_type="raw",
+            folder=Config.CLOUDINARY_FOLDER,
+            public_id=public_id,
+            overwrite=False
+        )
+    except Exception as e:
+        return None, f"Cloudinary upload failed: {str(e)}"
+
+    resume_url = result.get("secure_url") or result.get("url")
+    if not resume_url:
+        return None, "Cloudinary response missing file URL"
+    return resume_url, None
 
 
 def send_email(to_email, subject, body):
@@ -447,10 +478,9 @@ def apply():
         if not str(data.get(field, "")).strip():
             return jsonify({"error": f"{field.replace('_', ' ').title()} is required"}), 400
 
-    cleaned_name = secure_filename(resume.filename)
-    filename = f"{uuid.uuid4().hex}_{cleaned_name}"
-    resume_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-    resume.save(resume_path)
+    resume_url, upload_error = upload_resume_to_cloudinary(resume)
+    if not resume_url:
+        return jsonify({"error": "Resume upload failed", "details": upload_error}), 500
 
     applications.insert_one({
         "first_name": data.get("first_name"),
@@ -459,7 +489,7 @@ def apply():
         "phone": data.get("phone"),
         "skills": data.get("skills"),
         "job_role": data.get("job_role"),
-        "resume": filename,
+        "resume": resume_url,
         "status": "pending",
         "created_at": datetime.utcnow()
     })
@@ -585,14 +615,12 @@ SimuHire HR
         return jsonify({"message": "Candidate accepted and credentials sent"})
     return jsonify({"message": "Candidate accepted but email failed", "email_error": email_error}), 200
 
-@app.route("/uploads/<filename>")
-def view_resume(filename):  
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
-
-@app.route("/resume/<path:filename>")
-def get_resume(filename):
-    upload_folder = app.config.get("UPLOAD_FOLDER", "uploads")
-    return send_from_directory(upload_folder, filename)
+@app.route("/resume/<path:resume_ref>")
+def get_resume(resume_ref):
+    decoded = unquote(resume_ref or "").strip()
+    if decoded.startswith("http://") or decoded.startswith("https://"):
+        return redirect(decoded)
+    return jsonify({"error": "Resume link is invalid"}), 404
 
 # -------------------------------
 # REJECT

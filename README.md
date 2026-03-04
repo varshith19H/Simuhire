@@ -40,10 +40,10 @@ git push -u origin main
 This repo includes `vercel.json` for Flask deployment.
 
 1. Import project from GitHub in Vercel dashboard.
-2. Set Environment Variables from `.env.example`.
+2. Set Environment Variables from `.env.example` (Cloudinary vars are mandatory for resume upload).
 3. Deploy.
 
-## Important Production Note
+## Resume Storage
 
-Vercel filesystem is ephemeral. Resume uploads stored on local disk are temporary.
-For production-grade persistence, store resumes in cloud storage (S3/Cloudinary/Firebase Storage) and save URLs in MongoDB.
+Resume files are uploaded directly to Cloudinary and only the Cloudinary URL is stored in MongoDB.
+No local resume file storage is used.

@@ -6,3 +6,4 @@ pymongo
 werkzeug
 python-multipart
 gunicorn
+cloudinary

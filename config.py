@@ -28,8 +28,11 @@ class Config:
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/simuhire_db")
     MONGO_DB = os.getenv("MONGO_DB", "simuhire_db")
 
-    # File uploads (Vercel uses ephemeral filesystem; /tmp is writable during request lifecycle)
-    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/tmp/uploads" if os.getenv("VERCEL") else "uploads")
+    # Cloudinary (resume storage)
+    CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+    CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+    CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+    CLOUDINARY_FOLDER = os.getenv("CLOUDINARY_FOLDER", "simuhire/resumes")
 
     # SMTP for sending candidate credentials (Gmail example)
     SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
