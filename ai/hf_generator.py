@@ -68,6 +68,9 @@ def generate_mcq(prompt_text, num_questions=10, model_name=None, fallback_model_
     }
     """
 
+    if not Config.HF_TOKEN:
+        return {"error": "HF_TOKEN is not configured"}
+
     system_message = (
         "You are a professional AI interview question generator. "
         "Return strictly valid JSON only. Do not add explanation. "
@@ -267,5 +270,3 @@ JSON FORMAT:
         "error": "All configured MCQ models failed",
         "details": model_errors
     }
-    if not Config.HF_TOKEN:
-        return {"error": "HF_TOKEN is not configured"}

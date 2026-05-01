@@ -13,11 +13,13 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
+from pymongo.errors import ServerSelectionTimeoutError, PyMongoError
 from bson.objectid import ObjectId
 from config import Config
 from ai.hf_generator import generate_mcq
 import cloudinary
 import cloudinary.uploader
+import certifi
 
 
 app = Flask(__name__)
@@ -33,8 +35,22 @@ cloudinary.config(
 # -------------------------------
 # MongoDB Atlas Connection
 # -------------------------------
-client = MongoClient(Config.MONGO_URI)
+mongo_kwargs = {
+    "serverSelectionTimeoutMS": int(os.getenv("MONGO_SERVER_SELECTION_TIMEOUT_MS", "15000")),
+    "connectTimeoutMS": int(os.getenv("MONGO_CONNECT_TIMEOUT_MS", "15000")),
+    "socketTimeoutMS": int(os.getenv("MONGO_SOCKET_TIMEOUT_MS", "20000"))
+}
+if Config.MONGO_URI.startswith("mongodb+srv://"):
+    mongo_kwargs["tls"] = True
+    mongo_kwargs["tlsCAFile"] = certifi.where()
+
+client = MongoClient(Config.MONGO_URI, **mongo_kwargs)
 db = client[Config.MONGO_DB]
+
+try:
+    client.admin.command("ping")
+except Exception as e:
+    print("MongoDB ping failed on startup:", str(e))
 
 applications = db.applications
 users = db.users
@@ -121,6 +137,8 @@ def normalize_mcq_questions(raw_questions):
         question_text = str(q.get("question", "")).strip()
         options = q.get("options")
         answer = q.get("answer")
+        if isinstance(answer, str) and answer.isdigit():
+            answer = int(answer)
 
         if not question_text:
             continue
@@ -136,6 +154,118 @@ def normalize_mcq_questions(raw_questions):
         })
 
     return normalized
+
+
+def generate_mcq_with_ollama(prompt_text, num_questions):
+    ollama_prompt = f"""
+{prompt_text}
+
+Generate exactly {num_questions} multiple choice interview questions.
+Return ONLY valid JSON in this exact format:
+{{
+  "questions": [
+    {{
+      "question": "Question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answer": 0
+    }}
+  ]
+}}
+"""
+    content, err = query_ollama(ollama_prompt, model_name=Config.MCQ_OLLAMA_MODEL)
+    if not content:
+        return None, err
+
+    parsed = extract_json_block(content)
+    if isinstance(parsed, dict):
+        questions = parsed.get("questions")
+    elif isinstance(parsed, list):
+        questions = parsed
+    else:
+        questions = None
+
+    normalized = normalize_mcq_questions(questions)
+    if len(normalized) < num_questions:
+        return None, {"provider": "ollama", "error": "Ollama returned insufficient valid questions", "count": len(normalized)}
+    return {"questions": normalized[:num_questions]}, None
+
+
+def generate_deterministic_mcq(user, total_count):
+    skills_raw = str(user.get("skills", "")).strip()
+    role_raw = str(user.get("job_role", "")).strip() or "software engineering"
+    topics = [s.strip() for s in skills_raw.split(",") if s.strip()]
+    if not topics:
+        topics = [role_raw, "data structures", "algorithms", "databases", "web development"]
+
+    patterns = [
+        {
+            "question": "In {topic}, which practice most improves code maintainability?",
+            "options": ["Consistent naming and modular functions", "Using only global variables", "Avoiding comments entirely", "Writing very long functions"],
+            "answer": 0
+        },
+        {
+            "question": "For {topic}, what is the best first step when debugging a production issue?",
+            "options": ["Restart every service immediately", "Reproduce and inspect logs/metrics", "Rewrite the module from scratch", "Ignore transient errors"],
+            "answer": 1
+        },
+        {
+            "question": "Which approach is preferred for scalable {topic} systems?",
+            "options": ["Hard-coded values in multiple files", "No monitoring or alerts", "Automated tests and observability", "Manual deployment only"],
+            "answer": 2
+        },
+        {
+            "question": "In {topic}, why are code reviews important?",
+            "options": ["They eliminate all bugs permanently", "They reduce collaboration", "They slow releases with no value", "They improve quality and share knowledge"],
+            "answer": 3
+        }
+    ]
+
+    generated = []
+    pattern_idx = 0
+    topic_idx = 0
+    while len(generated) < total_count:
+        topic = topics[topic_idx % len(topics)]
+        template = patterns[pattern_idx % len(patterns)]
+        question_text = template["question"].format(topic=topic)
+        generated.append({
+            "id": len(generated) + 1,
+            "question": f"{question_text} (Scenario {len(generated) + 1})",
+            "options": template["options"],
+            "answer": template["answer"]
+        })
+        pattern_idx += 1
+        topic_idx += 1
+    return generated
+
+
+def generate_deterministic_virtual_questions(user, total_count):
+    role = str(user.get("job_role", "")).strip() or "software engineer"
+    skills_raw = str(user.get("skills", "")).strip()
+    skills = [s.strip() for s in skills_raw.split(",") if s.strip()]
+    primary_skill = skills[0] if skills else role
+
+    templates = [
+        "Tell me about a recent project where you used {skill}. What was your exact contribution?",
+        "You are assigned a high-priority bug in a {role} module. How would you investigate and resolve it?",
+        "Describe a time when you had conflicting requirements from product and engineering. How did you handle it?",
+        "How do you ensure code quality before merging changes in a {role} team?",
+        "Explain a performance bottleneck you solved in a system related to {skill}.",
+        "If your deployment fails in production, what is your immediate incident response plan?",
+        "How do you communicate technical trade-offs to non-technical stakeholders?",
+        "What metrics would you track to measure success for a feature built with {skill}?",
+        "How do you prioritize tasks when multiple deadlines are close?",
+        "Describe your approach to learning a new technology quickly in a live project."
+    ]
+
+    questions = []
+    idx = 0
+    while len(questions) < total_count:
+        t = templates[idx % len(templates)]
+        questions.append(
+            t.format(skill=primary_skill, role=role) + f" (Round Question {len(questions) + 1})"
+        )
+        idx += 1
+    return questions
 
 
 def generate_mcq_questions_with_fallback(user, total_count):
@@ -160,6 +290,8 @@ Each question must:
     attempts = 0
     max_attempts = max(8, total_count)
 
+    provider_order = ["ollama", "hf"] if Config.MCQ_USE_OLLAMA else ["hf", "ollama"]
+
     while len(collected) < total_count and attempts < max_attempts:
         attempts += 1
         remaining = total_count - len(collected)
@@ -174,15 +306,25 @@ Do not repeat questions that are semantically similar to:
 {recent_questions}
 """
 
-        result = generate_mcq(prompt, batch_size)
+        result = None
+        batch_errors = []
+
+        for provider in provider_order:
+            if provider == "ollama":
+                candidate_result, err = generate_mcq_with_ollama(prompt, batch_size)
+                if candidate_result:
+                    result = candidate_result
+                    break
+                batch_errors.append({"provider": "ollama", "details": err})
+            else:
+                candidate_result = generate_mcq(prompt, batch_size)
+                if candidate_result and not (isinstance(candidate_result, dict) and candidate_result.get("error")):
+                    result = candidate_result
+                    break
+                batch_errors.append({"provider": "hf", "details": candidate_result})
+
         if not result:
-            last_error = {"error": "Empty model response"}
-            continue
-        if isinstance(result, dict) and result.get("error"):
-            last_error = result
-            continue
-        if not isinstance(result, dict) or "questions" not in result:
-            last_error = {"error": "Invalid question format from AI", "details": result}
+            last_error = {"error": "All MCQ providers failed for batch", "details": batch_errors}
             continue
 
         parsed_batch = normalize_mcq_questions(result.get("questions"))
@@ -200,7 +342,23 @@ Do not repeat questions that are semantically similar to:
                 break
 
     if len(collected) < total_count:
-        return None, last_error or {"error": "Insufficient valid questions from AI"}
+        fallback_needed = total_count - len(collected)
+        deterministic = generate_deterministic_mcq(user, fallback_needed)
+        for item in deterministic:
+            dedupe_key = re.sub(r"\s+", " ", item["question"]).strip().lower()
+            if dedupe_key in seen:
+                continue
+            seen.add(dedupe_key)
+            collected.append({
+                "question": item["question"],
+                "options": item["options"],
+                "answer": item["answer"]
+            })
+            if len(collected) >= total_count:
+                break
+
+    if len(collected) < total_count:
+        return None, last_error or {"error": "Insufficient valid questions from AI and fallback"}
 
     final_questions = []
     for idx, q in enumerate(collected[:total_count], start=1):
@@ -213,9 +371,9 @@ Do not repeat questions that are semantically similar to:
     return final_questions, None
 
 
-def query_ollama(prompt_text):
+def query_ollama(prompt_text, model_name=None):
     payload = {
-        "model": Config.OLLAMA_MODEL,
+        "model": model_name or Config.OLLAMA_MODEL,
         "prompt": prompt_text,
         "stream": False
     }
@@ -234,7 +392,112 @@ def query_ollama(prompt_text):
     return content, None
 
 
-def query_hf_chat(prompt_text, model_name, max_tokens=800):
+def parse_virtual_question_candidates(content):
+    parsed = extract_json_block(content)
+    if isinstance(parsed, dict) and isinstance(parsed.get("questions"), list):
+        return [str(q).strip() for q in parsed["questions"] if str(q).strip()]
+    if isinstance(parsed, list):
+        return [str(q).strip() for q in parsed if str(q).strip()]
+
+    lines = []
+    for line in str(content or "").splitlines():
+        cleaned = re.sub(r"^\s*(\d+[\).\-\s]+|[-*]\s+)", "", line).strip()
+        if cleaned:
+            lines.append(cleaned)
+    return lines
+
+
+def normalize_virtual_questions(raw_questions, total_count):
+    normalized = []
+    seen = set()
+    for q in raw_questions or []:
+        text = re.sub(r"\s+", " ", str(q or "").strip())
+        if not text:
+            continue
+        if len(text) < 18:
+            continue
+        dedupe_key = text.lower()
+        if dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        normalized.append(text)
+        if len(normalized) >= total_count:
+            break
+    return normalized
+
+
+def generate_virtual_questions_with_fallback(user, total_count):
+    prompt = f"""
+Generate exactly {total_count} high-quality virtual interview questions for this candidate.
+Candidate skills: {user.get('skills')}
+Candidate role: {user.get('job_role')}
+
+Question quality rules:
+- Include practical, scenario-based and behavioral questions.
+- Test depth, communication, and problem-solving.
+- Avoid duplicate or generic questions.
+- Keep each question concise and interview-ready.
+
+Return ONLY valid JSON:
+{{
+  "questions": ["Question 1", "Question 2"]
+}}
+"""
+
+    providers = ["ollama", "hf"] if Config.USE_LOCAL_VIRTUAL_MODEL else ["hf", "ollama"]
+    hf_models = []
+    for m in [Config.VIRTUAL_HF_MODEL, Config.MODEL, Config.MCQ_SECONDARY_MODEL, Config.MCQ_TERTIARY_MODEL]:
+        if m and m not in hf_models:
+            hf_models.append(m)
+    max_hf_models = max(1, int(os.getenv("VIRTUAL_HF_MAX_MODELS", "2")))
+    hf_models = hf_models[:max_hf_models]
+
+    errors = []
+    best_ai_questions = []
+
+    for provider in providers:
+        if provider == "ollama":
+            content, err = query_ollama(prompt, model_name=Config.OLLAMA_MODEL)
+            if not content:
+                errors.append({"provider": "ollama", "details": err})
+                continue
+
+            questions = normalize_virtual_questions(parse_virtual_question_candidates(content), total_count)
+
+            if len(questions) >= total_count:
+                return questions[:total_count], None
+            if len(questions) > len(best_ai_questions):
+                best_ai_questions = questions
+            errors.append({"provider": "ollama", "error": "Insufficient virtual questions", "count": len(questions)})
+        else:
+            for model in hf_models:
+                content, err = query_hf_chat(prompt, model, max_tokens=800, request_timeout=25)
+                if not content:
+                    errors.append({"provider": "hf", "model": model, "details": err})
+                    continue
+
+                questions = normalize_virtual_questions(parse_virtual_question_candidates(content), total_count)
+
+                if len(questions) >= total_count:
+                    return questions[:total_count], None
+                if len(questions) > len(best_ai_questions):
+                    best_ai_questions = questions
+                errors.append({"provider": "hf", "model": model, "error": "Insufficient virtual questions", "count": len(questions)})
+
+    if best_ai_questions:
+        deterministic_fill = generate_deterministic_virtual_questions(user, total_count)
+        combined = normalize_virtual_questions(best_ai_questions + deterministic_fill, total_count)
+        if len(combined) >= total_count:
+            return combined[:total_count], {"fallback": "partial_ai_with_deterministic_fill", "errors": errors}
+
+    deterministic = generate_deterministic_virtual_questions(user, total_count)
+    deterministic = normalize_virtual_questions(deterministic, total_count)
+    if deterministic and len(deterministic) >= total_count:
+        return deterministic[:total_count], {"fallback": "deterministic", "errors": errors}
+    return None, {"errors": errors}
+
+
+def query_hf_chat(prompt_text, model_name, max_tokens=800, request_timeout=60):
     if not Config.HF_TOKEN:
         return None, {"provider": "hf", "error": "HF_TOKEN not configured"}
     headers = {
@@ -251,7 +514,7 @@ def query_hf_chat(prompt_text, model_name, max_tokens=800):
         "max_tokens": max_tokens
     }
     try:
-        response = requests.post(Config.HF_API_URL, headers=headers, json=payload, timeout=60)
+        response = requests.post(Config.HF_API_URL, headers=headers, json=payload, timeout=request_timeout)
     except Exception as e:
         return None, {"provider": "hf", "error": f"Request failed: {str(e)}"}
 
@@ -482,17 +745,28 @@ def apply():
     if not resume_url:
         return jsonify({"error": "Resume upload failed", "details": upload_error}), 500
 
-    applications.insert_one({
-        "first_name": data.get("first_name"),
-        "last_name": data.get("last_name"),
-        "email": data.get("email"),
-        "phone": data.get("phone"),
-        "skills": data.get("skills"),
-        "job_role": data.get("job_role"),
-        "resume": resume_url,
-        "status": "pending",
-        "created_at": datetime.utcnow()
-    })
+    try:
+        applications.insert_one({
+            "first_name": data.get("first_name"),
+            "last_name": data.get("last_name"),
+            "email": data.get("email"),
+            "phone": data.get("phone"),
+            "skills": data.get("skills"),
+            "job_role": data.get("job_role"),
+            "resume": resume_url,
+            "status": "pending",
+            "created_at": datetime.utcnow()
+        })
+    except ServerSelectionTimeoutError as e:
+        return jsonify({
+            "error": "Database connection failed",
+            "details": str(e)
+        }), 503
+    except PyMongoError as e:
+        return jsonify({
+            "error": "Database write failed",
+            "details": str(e)
+        }), 500
 
     return jsonify({"message": "Application submitted successfully"})
 
@@ -752,67 +1026,15 @@ def generate_virtual_questions():
     if user.get("virtual_taken"):
         return jsonify({"error": "Virtual interview already completed"}), 400
 
-    prompt = f"""
-Generate exactly {VIRTUAL_QUESTION_COUNT} high-quality virtual interview questions for this candidate.
-Candidate skills: {user.get('skills')}
-Candidate role: {user.get('job_role')}
+    try:
+        questions, last_error = generate_virtual_questions_with_fallback(user, VIRTUAL_QUESTION_COUNT)
+    except Exception as e:
+        questions = generate_deterministic_virtual_questions(user, VIRTUAL_QUESTION_COUNT)
+        last_error = {"error": "Virtual question generation exception", "details": str(e), "fallback": "deterministic"}
 
-Question quality rules:
-- Include practical, scenario-based and behavioral questions.
-- Test depth, communication, and problem-solving.
-- Avoid duplicate or generic questions.
-- Keep each question concise and interview-ready.
-
-Return ONLY valid JSON with this exact format:
-{{
-  "questions": [
-    "Question 1",
-    "Question 2",
-    "Question 3",
-    "Question 4",
-    "Question 5"
-  ]
-}}
-"""
-
-    questions = None
-    last_error = None
-    preferred_provider = "ollama" if Config.USE_LOCAL_VIRTUAL_MODEL else "hf"
-    fallback_provider = "hf" if preferred_provider == "ollama" else None
-
-    for _ in range(3):
-        content, err = (None, None)
-        if preferred_provider == "ollama":
-            content, err = query_ollama(prompt)
-        else:
-            content, err = query_hf_chat(prompt, Config.VIRTUAL_HF_MODEL, max_tokens=800)
-
-        if not content and fallback_provider == "hf":
-            content, fallback_err = query_hf_chat(prompt, Config.VIRTUAL_HF_MODEL, max_tokens=800)
-            if content:
-                err = None
-            else:
-                err = {"preferred_error": err, "fallback_error": fallback_err}
-
-        if not content:
-            last_error = err
-            continue
-
-        parsed = extract_json_block(content)
-        if isinstance(parsed, dict) and isinstance(parsed.get("questions"), list):
-            candidate_questions = [str(q).strip() for q in parsed["questions"] if str(q).strip()]
-        else:
-            candidate_questions = []
-            for line in str(content).splitlines():
-                cleaned = re.sub(r"^\s*(\d+[\).\-\s]+|[-*]\s+)", "", line).strip()
-                if cleaned:
-                    candidate_questions.append(cleaned)
-
-        if len(candidate_questions) >= VIRTUAL_QUESTION_COUNT:
-            questions = candidate_questions[:VIRTUAL_QUESTION_COUNT]
-            break
-
-        last_error = {"error": "AI returned insufficient virtual questions", "raw_output": content[:2000]}
+    if not questions:
+        questions = generate_deterministic_virtual_questions(user, VIRTUAL_QUESTION_COUNT)
+        last_error = {"error": "Virtual question generation failed", "details": last_error, "fallback": "deterministic"}
 
     if not questions:
         return jsonify({"error": "Failed to generate virtual interview questions", "details": last_error}), 500
@@ -824,7 +1046,8 @@ Return ONLY valid JSON with this exact format:
 
     return jsonify({
         "questions": questions,
-        "total_questions": len(questions)
+        "total_questions": len(questions),
+        "generation_info": last_error
     })
 
 
@@ -1089,11 +1312,22 @@ def start_test():
         questions_data, last_error = generate_mcq_questions_with_fallback(user, MCQ_QUESTION_COUNT)
     except Exception as e:
         print("START TEST ERROR:", str(e))
-        return jsonify({"error": "MCQ generation failed"}), 500
+        questions_data = None
+        last_error = {"error": "MCQ generation exception", "details": str(e)}
 
     if not questions_data:
         print("MCQ GENERATION ERROR:", last_error)
-        return jsonify({"error": f"Could not generate {MCQ_QUESTION_COUNT} valid interview questions", "details": last_error}), 500
+        # Hard fallback to guarantee interview continuity.
+        deterministic = generate_deterministic_mcq(user, MCQ_QUESTION_COUNT)
+        questions_data = [
+            {
+                "id": idx + 1,
+                "question": q["question"],
+                "options": q["options"],
+                "answer": q["answer"]
+            }
+            for idx, q in enumerate(deterministic[:MCQ_QUESTION_COUNT])
+        ]
 
     test_id = str(uuid.uuid4())
 
@@ -1216,4 +1450,3 @@ def session_status():
 
 if __name__ == "__main__":
     app.run(debug=os.getenv("FLASK_DEBUG", "false").lower() == "true")
-

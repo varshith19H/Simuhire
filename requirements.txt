@@ -7,3 +7,4 @@ werkzeug
 python-multipart
 gunicorn
 cloudinary
+certifi

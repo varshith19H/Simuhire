@@ -7,13 +7,15 @@ load_dotenv()
 class Config:
     HF_TOKEN = os.getenv("HF_TOKEN")
     HF_API_URL = os.getenv("HF_API_URL", "https://router.huggingface.co/v1/chat/completions")
-    MODEL = os.getenv("HF_MODEL", "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5")
-    MCQ_SECONDARY_MODEL = os.getenv("MCQ_SECONDARY_MODEL", "mistralai/Mistral-7B-Instruct-v0.3")
-    MCQ_TERTIARY_MODEL = os.getenv("MCQ_TERTIARY_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
+    MODEL = os.getenv("HF_MODEL", "microsoft/Phi-3-mini-4k-instruct")
+    MCQ_SECONDARY_MODEL = os.getenv("MCQ_SECONDARY_MODEL", "HuggingFaceH4/zephyr-7b-beta")
+    MCQ_TERTIARY_MODEL = os.getenv("MCQ_TERTIARY_MODEL", "google/gemma-2-2b-it")
     VIRTUAL_HF_MODEL = os.getenv("VIRTUAL_HF_MODEL", MODEL)
     USE_LOCAL_VIRTUAL_MODEL = os.getenv("USE_LOCAL_VIRTUAL_MODEL", "false").lower() == "true"
+    MCQ_USE_OLLAMA = os.getenv("MCQ_USE_OLLAMA", "true").lower() == "true"
     OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
-    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
+    OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "phi3:mini")
+    MCQ_OLLAMA_MODEL = os.getenv("MCQ_OLLAMA_MODEL", OLLAMA_MODEL)
     DID_API_KEY = os.getenv("DID_API_KEY")
     DID_BASE_URL = os.getenv("DID_BASE_URL", "https://api.d-id.com")
     DID_AVATAR_SOURCE_URL = os.getenv(
